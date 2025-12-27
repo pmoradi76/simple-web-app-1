@@ -1,0 +1,32 @@
+1-create repo in GitHub
+2-clone it to a dir in local machine
+3- download Figma code and put it into the local dir
+
+command line
+
+npm install
+npm run dev
+
+4-create .gitignore in the root to prevent node-modules files be uploaded in GitHub
+
+5- create URL in git hub (pages - public access)
+npm run build
+
+put itro docs folder
+
+in vite.config.ts made two changes
+
+- base:'./'
+
+- outdir:'../docs/'
+
+- copy docs files to GitHub
+
+----------------------
+AWS
+----------------------
+
+1- connect using
+1 - create a s3 in 
+
+
