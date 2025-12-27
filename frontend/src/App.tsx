@@ -1,50 +1,63 @@
-import { useState } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { useState } from "react";
+import { Send, Loader2 } from "lucide-react";
 
 export default function App() {
-  const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
+  const [inputText, setInputText] = useState("");
+  const [outputText, setOutputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // IMPORTANT:
+  // If your API route is POST /process, include it here.
+  // Example full URL:
+  // https://9z5r8j9h2d.execute-api.ap-southeast-2.amazonaws.com/process
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://9z5r8j9h2d.execute-api.ap-southeast-2.amazonaws.com/submit";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!inputText.trim()) return;
 
     setIsLoading(true);
+    setOutputText("");
 
-    // Mock API call - replace this with your actual AWS Lambda endpoint
     try {
-      // Simulating API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock response - replace with actual fetch call
-      const mockResponse = {
-        status: 'success',
-        message: 'Text received successfully',
-        receivedText: inputText,
-        timestamp: new Date().toISOString(),
-        processedLength: inputText.length,
-      };
-
-      setOutputText(JSON.stringify(mockResponse, null, 2));
-      
-      /* 
-      // Example of actual API call to AWS Lambda:
-      const response = await fetch('YOUR_API_GATEWAY_URL', {
-        method: 'POST',
+      const response = await fetch(API_URL, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ text: inputText }),
       });
-      
-      const data = await response.json();
+
+      // Try to parse JSON (even on errors, API Gateway might return JSON)
+      const contentType = response.headers.get("content-type") || "";
+      const data = contentType.includes("application/json")
+        ? await response.json()
+        : await response.text();
+
+      if (!response.ok) {
+        // Show useful debug info in the output box
+        setOutputText(
+          JSON.stringify(
+            {
+              ok: false,
+              status: response.status,
+              statusText: response.statusText,
+              data,
+            },
+            null,
+            2
+          )
+        );
+        return;
+      }
+
       setOutputText(JSON.stringify(data, null, 2));
-      */
-      
     } catch (error) {
-      setOutputText(`Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
+      setOutputText(
+        `Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`
+      );
     } finally {
       setIsLoading(false);
     }
